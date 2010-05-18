@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+# Modified from code at:
+# http://code.activestate.com/recipes/543270-disk-space-usage-displayed-as-a-tree/
 """
 Disk space usage displayed as a tree - pydu.py
 Copyright (C) 2010  Sol Jerome
@@ -15,7 +17,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 
 import getopt
@@ -41,23 +42,23 @@ class Options:
         """ Display all options along with current values """
         print('Options:')
         if self.max_depth >= 0:
-            print('Max depth = %d' % (self.max_depth))
+            print("Max depth = %d" % (self.max_depth))
         else:
-            print('Max depth = any')
-        print('Show files = %s' % (bool_strings[self.show_files]))
-        print('Indent size = %d' % (self.indent_size))
-        print('Follow links = %s' % (bool_strings[self.follow_links]))
+            print("Max depth = any")
+        print("Show files = %s" % (bool_strings[self.show_files]))
+        print("Indent size = %d" % (self.indent_size))
+        print("Follow links = %s" % (bool_strings[self.follow_links]))
 
 
 def get_indent_str(depth, is_dir, options):
     s = ''
     for i in range(depth):
         if is_dir and i == depth - 1:
-            first_char = '|'
-            other_chars = '---'
+            first_char = "|"
+            other_chars = "---"
         else:
-            first_char = '|'
-            other_chars = '   '
+            first_char = "|"
+            other_chars = "   "
         s += first_char + (other_chars * (options.indent_size - 1))
     return s
 
@@ -65,7 +66,7 @@ def get_indent_str(depth, is_dir, options):
 def print_path(path, bytes, pct, is_dir, depth, options):
     indent_str = get_indent_str(depth, is_dir, options)
     if path:
-        print('%s%- 11.1f %3.0f%% %s' % \
+        print("%s%- 11.1f %3.0f%% %s" % \
              (indent_str, bytes / 1000, pct, path))
     else:
         print(indent_str)
@@ -107,15 +108,15 @@ def dir_size(dir_path, depth, options):
         dir_list = os.listdir(dir_path)
     except:
         if isdir(dir_path):
-            print('Cannot list directory %s' % dir_path)
+            print("Cannot list directory %s" % dir_path)
         return 0
     item_list = []
     for item in dir_list:
-        path = '%s/%s' % (dir_path, item)
+        path = "%s/%s" % (dir_path, item)
         try:
             stats = os.stat(path)
         except:
-            print('Cannot stat %s' % path)
+            print("Cannot stat %s" % path)
             continue
         size = stats[6]
         if isdir(path) and (options.follow_links or \
@@ -143,13 +144,13 @@ def dir_size(dir_path, depth, options):
 def usage(name):
     """ Print out usage information """
     options = Options()
-    print('''\
+    print("""\
 Usage: %s [-d depth] [-f on|off] [-i indent-size] [-l on|off] dir [dir...]
     -d    Max depth of directories. '-d any' => no limit. (default = %d)
     -f    Show files (default = %s)
     -i    Indent size (default = %d)
     -l    Follow symbolic links (Unix only. default = %s)
-''' % (name, options.max_depth,
+""" % (name, options.max_depth,
      bool_strings[options.show_files], options.indent_size,
      bool_strings[options.follow_links]))
 
@@ -164,40 +165,40 @@ if __name__ == '__main__':
     options = Options()
     errmsg = ''
     for o, a in opts:
-        if o == '-d':
-            if a == 'any':
+        if o == "-d":
+            if a == "any":
                 options.max_depth = -1
             else:
                 try:
                     options.max_depth = int(a)
                 except:
-                    errmsg = 'Invalid value for depth'
+                    errmsg = "Invalid value for depth"
                 else:
                     if options.max_depth < 0 and options.max_depth != -1:
-                        errmsg = 'Max depth must be >= 0 or -1'
-        elif o == '-f':
-            if a == 'on':
+                        errmsg = "Max depth must be >= 0 or -1"
+        elif o == "-f":
+            if a == "on":
                 options.show_files = True
-            elif a == 'off':
+            elif a == "off":
                 options.show_files = False
             else:
-                errmsg = 'Invalid value for -f'
-        elif o == '-i':
+                errmsg = "Invalid value for -f"
+        elif o == "-i":
             try:
                 options.indent_size = int(a)
             except:
-                errmsg = ('Invalid value for indent size (you said %s)' % \
+                errmsg = ("Invalid value for indent size (you said %s)" % \
                            options.indent_size)
             else:
                 if options.indent_size < 2:
-                    errmsg = 'Indent size must be at least 2'
-        elif o == '-l':
-            if a == 'on':
+                    errmsg = "Indent size must be at least 2"
+        elif o == "-l":
+            if a == "on":
                 options.follow_links = True
-            elif a == 'off':
+            elif a == "off":
                 options.follow_links = False
             else:
-                errmsg = 'Invalid value for -l'
+                errmsg = "Invalid value for -l"
 
     if errmsg:
         print(errmsg)
@@ -210,9 +211,9 @@ if __name__ == '__main__':
         paths = args
 
     for path in paths:
-        print('Disk usage for directory %s:' % path)
+        print("Disk usage for directory %s:" % path)
         if isdir(path):
             dsize, items = dir_size(path, 0, options)
             print_dir(path, dsize, 100.0, items, 0, options)
         else:
-            print('Error:', path, 'is not a directory')
+            print("Error:", path, "is not a directory")
