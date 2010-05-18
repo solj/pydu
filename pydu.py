@@ -1,5 +1,4 @@
-#!/opt/apps/python/3.0/bin/python
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Disk space usage displayed as a tree - pydu.py
 #
@@ -13,8 +12,10 @@ from os.path import isdir, islink
 
 bool_strings = ['off', 'on']
 
+
 class Options:
     """ Holds program options as object attributes """
+
     def __init__(self):
         # When adding a new option, initialize it here.
         self.max_depth = 2
@@ -33,6 +34,7 @@ class Options:
         print('Indent size = %d' % (self.indent_size))
         print('Follow links = %s' % (bool_strings[self.follow_links]))
 
+
 def get_indent_str(depth, is_dir, options):
     s = ''
     for i in range(depth):
@@ -45,7 +47,8 @@ def get_indent_str(depth, is_dir, options):
         s += first_char + (other_chars * (options.indent_size - 1))
     return s
 
-def print_path (path, bytes, pct, is_dir, depth, options):
+
+def print_path(path, bytes, pct, is_dir, depth, options):
     indent_str = get_indent_str(depth, is_dir, options)
     if path:
         print('%s%- 11.1f %3.0f%% %s' % \
@@ -53,14 +56,16 @@ def print_path (path, bytes, pct, is_dir, depth, options):
     else:
         print(indent_str)
 
-def is_dir (item):
+
+def is_dir(item):
     """
     Directories have 3 entries (size, path, list of contents) while files
     have 2 (size, path).
     """
     return len(item) == 3
 
-def print_dir (path, dsize, pct, items, depth, options):
+
+def print_dir(path, dsize, pct, items, depth, options):
     """ Print entire tree starting with given directory """
     print_path(path, dsize, pct, True, depth, options)
     dir = True
@@ -78,7 +83,8 @@ def print_dir (path, dsize, pct, items, depth, options):
         else:
             print_path(path, size, pct, False, depth+1, options)
 
-def dir_size (dir_path, depth, options):
+
+def dir_size(dir_path, depth, options):
     """
     For given directory, returns the list [size, [entry-1, entry-2, ...]]
     """
@@ -119,16 +125,16 @@ def dir_size (dir_path, depth, options):
 
     return [total, item_list]
 
-def usage (name):
+
+def usage(name):
     """ Print out usage information """
     options = Options()
-    print('''
+    print('''\
 Usage: %s [-d depth] [-f on|off] [-i indent-size] [-l on|off] dir [dir...]
     -d    Max depth of directories. '-d any' => no limit. (default = %d)
     -f    Show files (default = %s)
     -i    Indent size (default = %d)
     -l    Follow symbolic links (Unix only. default = %s)
-
 ''' % (name, options.max_depth,
      bool_strings[options.show_files], options.indent_size,
      bool_strings[options.follow_links]))
@@ -184,7 +190,7 @@ if __name__ == '__main__':
         usage(sys.argv[0])
         sys.exit(1)
 
-    if len (args) < 1:
+    if len(args) < 1:
         usage(sys.argv[0])
         sys.exit(1)
     else:
