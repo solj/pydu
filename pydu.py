@@ -20,7 +20,7 @@ class Options:
         # When adding a new option, initialize it here.
         self.max_depth = 2
         self.show_files = False
-        self.indent_size = 4
+        self.indent_size = 2
         self.follow_links = False
 
     def dump(self):
@@ -187,7 +187,6 @@ if __name__ == '__main__':
 
     if errmsg:
         print(errmsg)
-        usage(sys.argv[0])
         sys.exit(1)
 
     if len(args) < 1:
