@@ -29,7 +29,7 @@ bool_strings = ['off', 'on']
 
 
 class Options:
-    """ Holds program options as object attributes """
+    """Holds program options as object attributes"""
 
     def __init__(self):
         # When adding a new option, initialize it here.
@@ -38,33 +38,26 @@ class Options:
         self.indent_size = 2
         self.follow_links = False
 
-    def dump(self):
-        """ Display all options along with current values """
-        print('Options:')
-        if self.max_depth >= 0:
-            print("Max depth = %d" % (self.max_depth))
-        else:
-            print("Max depth = any")
-        print("Show files = %s" % (bool_strings[self.show_files]))
-        print("Indent size = %d" % (self.indent_size))
-        print("Follow links = %s" % (bool_strings[self.follow_links]))
 
-
-def get_indent_str(depth, is_dir, options):
+def get_indent_str(depth, is_dir, options, last_item):
     s = ''
-    for i in range(depth):
-        if is_dir and i == depth - 1:
-            first_char = "|"
-            other_chars = "---"
+    depthlength = len(range(depth))
+    for i, j in enumerate(range(depth)):
+        if last_item and ((i+1) == depthlength):
+            # last item in the directory list
+            first_char = "`"
         else:
             first_char = "|"
+        if is_dir and j == depth - 1:
+            other_chars = "--"
+        else:
             other_chars = "   "
         s += first_char + (other_chars * (options.indent_size - 1))
     return s
 
 
-def print_path(path, bytes, pct, is_dir, depth, options):
-    indent_str = get_indent_str(depth, is_dir, options)
+def print_path(path, bytes, pct, is_dir, depth, options, last_item):
+    indent_str = get_indent_str(depth, is_dir, options, last_item)
     if path:
         print("%s%- 11.1f %3.0f%% %s" % \
              (indent_str, bytes / 1000, pct, path))
@@ -80,11 +73,12 @@ def is_dir(item):
     return len(item) == 3
 
 
-def print_dir(path, dsize, pct, items, depth, options):
-    """ Print entire tree starting with given directory """
-    print_path(path, dsize, pct, True, depth, options)
+def print_dir(path, dsize, pct, items, depth, options, last_item=False):
+    """Print entire tree starting with given directory"""
+    print_path(path, dsize, pct, True, depth, options, last_item)
     dir = True
-    for item in items:
+    dirsize = len(items)
+    for index, item in enumerate(items):
         size = item[0]
         path = item[1]
         dir = is_dir(item)
@@ -94,7 +88,11 @@ def print_dir(path, dsize, pct, items, depth, options):
             pct = 0.0
         if dir:
             dir_contents = item[2]
-            print_dir(path, size, pct, dir_contents, depth+1, options)
+            if (index+1) == dirsize:
+                # last item in the directory, use '`' character
+                print_dir(path, size, pct, dir_contents, depth+1, options, True)
+            else:
+                print_dir(path, size, pct, dir_contents, depth+1, options)
         else:
             print_path(path, size, pct, False, depth+1, options)
 
@@ -142,7 +140,7 @@ def dir_size(dir_path, depth, options):
 
 
 def usage(name):
-    """ Print out usage information """
+    """Print out usage information"""
     options = Options()
     print("""\
 Usage: %s [-d depth] [-f on|off] [-i indent-size] [-l on|off] dir [dir...]
