@@ -94,7 +94,10 @@ def print_dir(path, dsize, pct, items, depth, options, last_item=False):
             else:
                 print_dir(path, size, pct, dir_contents, depth+1, options)
         else:
-            print_path(path, size, pct, False, depth+1, options)
+            if (index+1) == dirsize:
+                print_path(path, size, pct, False, depth+1, options, True)
+            else:
+                print_path(path, size, pct, False, depth+1, options, False)
 
 
 def dir_size(dir_path, depth, options):
